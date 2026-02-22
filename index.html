@@ -521,7 +521,7 @@
         }
 
         function updateCharts(data) {
-            onst top10 = [...data.members]
+            const top10 = [...data.members]
                 .sort((a, b) => b.totalMessages - a.totalMessages)
                 .slice(0, 10);
             
