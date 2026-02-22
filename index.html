@@ -521,7 +521,9 @@
         }
 
         function updateCharts(data) {
-            const top10 = data.members.slice(0, 10);
+            onst top10 = [...data.members]
+                .sort((a, b) => b.totalMessages - a.totalMessages)
+                .slice(0, 10);
             
             // Messages distribution chart
             if (messagesChart) messagesChart.destroy();
