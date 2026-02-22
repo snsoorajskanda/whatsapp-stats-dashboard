@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BADASS™ Intl WhatsApp Stats - Avg Messages/Day</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .legend {
+            padding: 20px 30px;
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            margin: 20px 30px;
+            border-radius: 8px;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.95em;
+            color: #856404;
+        }
+        
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+        
+        th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        td {
+            padding: 15px;
+            font-size: 0.95em;
+        }
+        
+        .rank {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .top3 {
+            background: linear-gradient(90deg, #fff8dc 0%, #ffffff 100%) !important;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .emoji {
+            font-size: 1.3em;
+        }
+        
+        .metric {
+            font-family: 'Courier New', monospace;
+            color: #555;
+        }
+        
+        .avg-day {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 BADASS™ Intl WhatsApp Group</h1>
+            <p>Average Messages Per Day Analysis</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">Generated: February 22, 2026</p>
+        </div>
+        
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-label">Total Messages</div>
+                <div class="stat-value">30,935</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Group Average</div>
+                <div class="stat-value">1,628</div>
+                <div style="color: #999; font-size: 0.9em;">msgs/person</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Contributor</div>
+                <div class="stat-value">44.0</div>
+                <div style="color: #999; font-size: 0.9em;">msgs/day</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Spam Ratio</div>
+                <div class="stat-value">152.9x</div>
+                <div style="color: #999; font-size: 0.9em;">Top vs Bottom</div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-title">Activity Levels:</div>
+            <div class="legend-items">
+                <span>🔥 Top Contributors (>30 msgs/day)</span>
+                <span>💪 Active (15-30)</span>
+                <span>👍 Moderate (5-15)</span>
+                <span>😐 Low (1-5)</span>
+                <span>💤 Slackers (<1)</span>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Total Messages</th>
+                        <th>Days Active</th>
+                        <th>Avg/Day</th>
+                        <th></th>
+                        <th>First Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="top3">
+                        <td class="rank">1</td>
+                        <td class="username">Anirudh California S</td>
+                        <td class="metric">8,227</td>
+                        <td class="metric">187</td>
+                        <td class="avg-day">43.99</td>
+                        <td class="emoji">🔥</td>
+                        <td class="metric">20/08/2025</td>
+                    </tr>
+                    <tr class="top3">
+                        <td class="rank">2</td>
+                        <td class="username">Amizhthni PRK</td>
+                        <td class="metric">6,289</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">31.13</td>
+                        <td class="emoji">🔥</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr class="top3">
+                        <td class="rank">3</td>
+                        <td class="username">Sooraj</td>
+                        <td class="metric">4,590</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">22.72</td>
+                        <td class="emoji">💪</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">4</td>
+                        <td class="username">Anchal Debnath</td>
+                        <td class="metric">2,932</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">14.51</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">5</td>
+                        <td class="username">Saketh</td>
+                        <td class="metric">2,470</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">12.23</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">6</td>
+                        <td class="username">IITM EE Dhaksin Prab</td>
+                        <td class="metric">35</td>
+                        <td class="metric">3</td>
+                        <td class="avg-day">11.67</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">20/02/2026</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">7</td>
+                        <td class="username">Ameya Bagal</td>
+                        <td class="metric">1,745</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">8.64</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">8</td>
+                        <td class="username">ANIRUDH B S</td>
+                        <td class="metric">1,580</td>
+                        <td class="metric">202</td>
+                        <td class="avg-day">7.82</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">05/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">9</td>
+                        <td class="username">Advait Iyer</td>
+                        <td class="metric">1,064</td>
+                        <td class="metric">188</td>
+                        <td class="avg-day">5.66</td>
+                        <td class="emoji">👍</td>
+                        <td class="metric">19/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">10</td>
+                        <td class="username">Justin Rangad</td>
+                        <td class="metric">549</td>
+                        <td class="metric">134</td>
+                        <td class="avg-day">4.10</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">12/10/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">11</td>
+                        <td class="username">Nachiket Dighe</td>
+                        <td class="metric">12</td>
+                        <td class="metric">3</td>
+                        <td class="avg-day">4.00</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">20/02/2026</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">12</td>
+                        <td class="username">Ayushman</td>
+                        <td class="metric">586</td>
+                        <td class="metric">176</td>
+                        <td class="avg-day">3.33</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">31/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">13</td>
+                        <td class="username">Juswanth T</td>
+                        <td class="metric">146</td>
+                        <td class="metric">60</td>
+                        <td class="avg-day">2.43</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">25/12/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">14</td>
+                        <td class="username">Devansh</td>
+                        <td class="metric">61</td>
+                        <td class="metric">32</td>
+                        <td class="avg-day">1.91</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">22/01/2026</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">15</td>
+                        <td class="username">Srinivasan Kidambi</td>
+                        <td class="metric">165</td>
+                        <td class="metric">108</td>
+                        <td class="avg-day">1.53</td>
+                        <td class="emoji">😐</td>
+                        <td class="metric">07/11/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">16</td>
+                        <td class="username">Shashank Babu</td>
+                        <td class="metric">179</td>
+                        <td class="metric">201</td>
+                        <td class="avg-day">0.89</td>
+                        <td class="emoji">💤</td>
+                        <td class="metric">06/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">17</td>
+                        <td class="username">Angela Roy</td>
+                        <td class="metric">150</td>
+                        <td class="metric">199</td>
+                        <td class="avg-day">0.75</td>
+                        <td class="emoji">💤</td>
+                        <td class="metric">08/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">18</td>
+                        <td class="username">Meta AI</td>
+                        <td class="metric">134</td>
+                        <td class="metric">201</td>
+                        <td class="avg-day">0.67</td>
+                        <td class="emoji">💤</td>
+                        <td class="metric">06/08/2025</td>
+                    </tr>
+                    <tr>
+                        <td class="rank">19</td>
+                        <td class="username">Aditya Mallick</td>
+                        <td class="metric">21</td>
+                        <td class="metric">73</td>
+                        <td class="avg-day">0.29</td>
+                        <td class="emoji">💤</td>
+                        <td class="metric">12/12/2025</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

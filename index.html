@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BADASS™ Intl - Live Stats Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            color: #666;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-subtitle {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .leaderboard {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .leaderboard-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+
+        .leaderboard-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .leaderboard-item.rank-1::before { width: 100%; opacity: 0.1; }
+        .leaderboard-item.rank-2::before { width: 80%; opacity: 0.08; }
+        .leaderboard-item.rank-3::before { width: 60%; opacity: 0.06; }
+
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            width: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .rank-1 .rank { color: #FFD700; }
+        .rank-2 .rank { color: #C0C0C0; }
+        .rank-3 .rank { color: #CD7F32; }
+
+        .member-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            margin-left: 10px;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .member-stats {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .avg-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-fire { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; }
+        .badge-active { background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; }
+        .badge-moderate { background: linear-gradient(135deg, #ffd93d, #f39c12); color: white; }
+        .badge-low { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; }
+        .badge-slacker { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: white; }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 5px;
+        }
+
+        #uploadSection {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e6f2ff;
+            border-color: #4caf50;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 BADASS™ Intl Live Stats Dashboard</h1>
+            <div class="last-updated">
+                <span class="pulse"></span>
+                <span>Last Updated: <span id="lastUpdate">Loading...</span></span>
+            </div>
+        </div>
+
+        <div id="uploadSection">
+            <h2 style="margin-bottom: 20px; color: #333;">📤 Update Stats</h2>
+            <div class="upload-area" id="uploadArea">
+                <p style="font-size: 1.2em; margin-bottom: 15px;">📁 Drag & Drop your ChatStats HTML file here</p>
+                <p style="color: #666; margin-bottom: 15px;">or</p>
+                <button class="btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                <input type="file" id="fileInput" accept=".html" />
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your chat data...</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Messages</div>
+                <div class="stat-value" id="totalMessages">-</div>
+                <div class="stat-subtitle">All time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Members</div>
+                <div class="stat-value" id="activeMembers">-</div>
+                <div class="stat-subtitle">Contributing members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Contributor</div>
+                <div class="stat-value" id="topContributor">-</div>
+                <div class="stat-subtitle">msgs/day</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Spam Ratio</div>
+                <div class="stat-value" id="spamRatio">-</div>
+                <div class="stat-subtitle">Top vs Bottom</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="chart-card">
+                <div class="chart-title">📊 Messages Distribution</div>
+                <canvas id="messagesChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">📈 Activity Levels</div>
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <div class="leaderboard-title">
+                <span>🏆 Spam Leaderboard</span>
+            </div>
+            <div id="leaderboardContent">
+                <p style="text-align: center; color: #999;">Upload a ChatStats HTML file to see the leaderboard</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messagesChart = null;
+        let activityChart = null;
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFiles, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            
+            const file = files[0];
+            if (!file.name.endsWith('.html')) {
+                alert('Please upload a ChatStats HTML file');
+                return;
+            }
+
+            loading.style.display = 'block';
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                try {
+                    const html = event.target.result;
+                    const data = parseHTML(html);
+                    updateDashboard(data);
+                    loading.style.display = 'none';
+                    
+                    // Save to localStorage
+                    localStorage.setItem('whatsappStats', JSON.stringify(data));
+                    localStorage.setItem('lastUpdate', new Date().toISOString());
+                } catch (error) {
+                    console.error('Error parsing file:', error);
+                    alert('Error parsing the file. Please make sure it\'s a valid ChatStats HTML export.');
+                    loading.style.display = 'none';
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function parseHTML(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract messages per user
+            const messagesSection = html.substring(
+                html.indexOf("id='num_mensajes'"),
+                html.indexOf("id='num_palabras'")
+            );
+            const messagesMatches = [...messagesSection.matchAll(/<span class='dato'>(\d+) : ([^<]+)<\/span>/g)];
+            
+            // Extract first message dates
+            const firstMsgSection = html.substring(
+                html.indexOf("id='primer_mensaje'"),
+                html.indexOf("id='ultimo_mensaje'")
+            );
+            const dateMatches = [...firstMsgSection.matchAll(/(\d{2}\/\d{2}\/\d{4}) \d{2}:\d{2}.*?<span class='dato'>([^<]+)<\/span>/gs)];
+            
+            const today = new Date(2026, 1, 22); // Feb 22, 2026
+            const members = [];
+            
+            messagesMatches.forEach(match => {
+                const totalMessages = parseInt(match[1]);
+                const username = match[2].trim();
+                
+                // Find first message date
+                const dateMatch = dateMatches.find(dm => dm[2].trim() === username);
+                if (dateMatch) {
+                    const [day, month, year] = dateMatch[1].split('/');
+                    const firstDate = new Date(year, month - 1, day);
+                    const daysActive = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+                    const avgPerDay = totalMessages / daysActive;
+                    
+                    members.push({
+                        username,
+                        totalMessages,
+                        daysActive,
+                        avgPerDay,
+                        firstDate: dateMatch[1]
+                    });
+                }
+            });
+            
+            members.sort((a, b) => b.avgPerDay - a.avgPerDay);
+            
+            return {
+                members,
+                totalMessages: members.reduce((sum, m) => sum + m.totalMessages, 0),
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('totalMessages').textContent = data.totalMessages.toLocaleString();
+            document.getElementById('activeMembers').textContent = data.members.length;
+            document.getElementById('topContributor').textContent = data.members[0].avgPerDay.toFixed(1);
+            const spamRatio = (data.members[0].avgPerDay / data.members[data.members.length - 1].avgPerDay).toFixed(1);
+            document.getElementById('spamRatio').textContent = spamRatio + 'x';
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+            
+            // Update charts
+            updateCharts(data);
+            
+            // Update leaderboard
+            updateLeaderboard(data.members);
+        }
+
+        function updateCharts(data) {
+            const top10 = data.members.slice(0, 10);
+            
+            // Messages distribution chart
+            if (messagesChart) messagesChart.destroy();
+            const ctx1 = document.getElementById('messagesChart').getContext('2d');
+            messagesChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: top10.map(m => m.username.split(' ')[0]),
+                    datasets: [{
+                        label: 'Total Messages',
+                        data: top10.map(m => m.totalMessages),
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            
+            // Activity levels chart
+            if (activityChart) activityChart.destroy();
+            const ctx2 = document.getElementById('activityChart').getContext('2d');
+            activityChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['🔥 Top (>30)', '💪 Active (15-30)', '👍 Moderate (5-15)', '😐 Low (1-5)', '💤 Slackers (<1)'],
+                    datasets: [{
+                        data: [
+                            data.members.filter(m => m.avgPerDay > 30).length,
+                            data.members.filter(m => m.avgPerDay >= 15 && m.avgPerDay <= 30).length,
+                            data.members.filter(m => m.avgPerDay >= 5 && m.avgPerDay < 15).length,
+                            data.members.filter(m => m.avgPerDay >= 1 && m.avgPerDay < 5).length,
+                            data.members.filter(m => m.avgPerDay < 1).length
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 107, 107, 0.8)',
+                            'rgba(78, 205, 196, 0.8)',
+                            'rgba(255, 217, 61, 0.8)',
+                            'rgba(149, 165, 166, 0.8)',
+                            'rgba(192, 192, 192, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLeaderboard(members) {
+            const leaderboardContent = document.getElementById('leaderboardContent');
+            
+            const html = members.map((member, index) => {
+                let badge = '';
+                let badgeClass = '';
+                let emoji = '';
+                
+                if (member.avgPerDay > 30) {
+                    badge = member.avgPerDay.toFixed(1);
+                    badgeClass = 'badge-fire';
+                    emoji = '🔥';
+                } else if (member.avgPerDay >= 15) {
+                    badge = member.avgPerDay.toFixed(1);
+                    badgeClass = 'badge-active';
+                    emoji = '💪';
+                } else if (member.avgPerDay >= 5) {
+                    badge = member.avgPerDay.toFixed(1);
+                    badgeClass = 'badge-moderate';
+                    emoji = '👍';
+                } else if (member.avgPerDay >= 1) {
+                    badge = member.avgPerDay.toFixed(1);
+                    badgeClass = 'badge-low';
+                    emoji = '😐';
+                } else {
+                    badge = member.avgPerDay.toFixed(2);
+                    badgeClass = 'badge-slacker';
+                    emoji = '💤';
+                }
+                
+                const rankClass = index < 3 ? `rank-${index + 1}` : '';
+                
+                return `
+                    <div class="leaderboard-item ${rankClass}">
+                        <div class="rank">${index + 1}</div>
+                        <div class="member-info">
+                            <div class="member-name">${member.username}</div>
+                            <div class="member-stats">
+                                ${member.totalMessages.toLocaleString()} messages • ${member.daysActive} days active
+                            </div>
+                        </div>
+                        <div class="avg-badge ${badgeClass}">
+                            <span class="emoji">${emoji}</span>${badge}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            leaderboardContent.innerHTML = html;
+        }
+
+        // Load cached data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const cachedData = localStorage.getItem('whatsappStats');
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            
+            if (cachedData && lastUpdate) {
+                const data = JSON.parse(cachedData);
+                updateDashboard(data);
+                document.getElementById('lastUpdate').textContent = new Date(lastUpdate).toLocaleString();
+            }
+        });
+    </script>
+</body>
+</html>
