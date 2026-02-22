@@ -5,7 +5,7 @@ Live statistics dashboard for tracking WhatsApp group activity!
 ## 🚀 Quick Start
 
 ### Option 1: Visit Live Dashboard (Recommended)
-Just go to: **https://YOUR_USERNAME.github.io/whatsapp-stats-dashboard/**
+Just go to: **https://snsoorajskanda.github.io/whatsapp-stats-dashboard/**
 
 Then drag & drop your ChatStats HTML export to update!
 
